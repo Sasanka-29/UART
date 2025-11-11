@@ -102,20 +102,6 @@ Troubleshooting
 Contributing
 - Feel free to open issues or PRs to add features, fix bugs, or improve documentation.
 
-License
-- Use as-is. No license file is included; assume personal/educational use unless you add a license.
-
 Author
 - Slayer404 (repository owner)
 
-Notes and suggestions
-- Consider improving BlinkLED_VariableSpeed.c by:
-  - Fixing the logical condition in the ISR (use || or switch).
-  - Debouncing/clearing the UART buffer when needed.
-  - Adding explicit ACKs if desired for more robust PC↔MCU protocol.
-- Consider adding a small README or comments to each script with example commands and the expected output for easier onboarding.
-
-If you want, I can:
-- Add a short Makefile or example build commands for msp430-gcc,
-- Patch the ISR conditional bug and create a suggested commit,
-- Or create a cross-platform example that auto-detects COM ports for the PC scripts.
