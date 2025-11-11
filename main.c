@@ -1,64 +1,75 @@
 #include <msp430.h>
-#include <string.h>
+#include <stdbool.h>
 
-const char refArray[10] = {'A', 'F', 'K', '3', 'Z', 'Q', 'L', '9', 'M', '2'};
-char rxBuffer[5];
-unsigned char rxIndex = 0;
+#define LED1 BIT0 // P1.0 Green
+#define LED2 BIT6 // P1.6 Red
+volatile char rxData = 0;
+volatile char currentMode = 0;
 
-void uartSendChar(char c) {
-  while (!(IFG2 & UCA0TXIFG))
-    ;
-  UCA0TXBUF = c;
+void initClock1MHz(void) {
+  if (CALBC1_1MHZ == 0xFF)
+    while (1)
+      ;
+  BCSCTL1 = CALBC1_1MHZ;
+  DCOCTL = CALDCO_1MHZ;
 }
-void uartSendString(const char *str) {
-  while (*str) {
-    uartSendChar(*str++);
-  }
-}
-void initUART() {
-  P1SEL |= BIT1 + BIT2; // Configure P1.1 & P1.2 for Tx and Rx
+
+void initUART9600(void) {
+  P1SEL |= BIT1 + BIT2;
   P1SEL2 |= BIT1 + BIT2;
 
   UCA0CTL1 |= UCSWRST;
-  UCA0CTL1 |= UCSSEL_2; // Set clock to SMCLK
+  UCA0CTL1 |= UCSSEL_2;
 
-  UCA0BR0 = 104; // 1Mhz/104= 9600
+  UCA0BR0 = 104;
   UCA0BR1 = 0;
   UCA0MCTL = UCBRS0;
 
-  UCA0CTL1 &= ~UCSWRST; // Reset USCI_A0
-  IE2 |= UCA0RXIE;      // Enables Rx interrupt
+  UCA0CTL1 &= ~UCSWRST;
+  IE2 |= UCA0RXIE;
 }
+
 int main(void) {
-  WDTCTL = WDTPW | WDTHOLD;
-  BCSCTL1 = CALBC1_1MHZ; // Set DCo for 1Mhz
-  DCOCTL = CALDCO_1MHZ;
+  WDTCTL = WDTPW + WDTHOLD;
+  initClock1MHz();
+  P1DIR |= LED1 | LED2;    // Set P1.0 and P1.6 as output
+  P1OUT &= ~(LED1 | LED2); // Turn both OFF initially
 
-  initUART();
+  initUART9600();
+
   __enable_interrupt();
+  __bis_SR_register(LPM0_bits + GIE); // Sleep until UART interrupt
 
-  while (1)
-    ;
-}
-#pragma vector = USCIAB0RX_VECTOR
-__interrupt void USCI0RX_ISR(void) {
-  char received = UCA0RXBUF; // Read the incoming byte into received
+  while (1) {
+    if (currentMode == 'A') {
+      P1OUT ^= LED1;
+      // P1OUT &= ~LED2;
+      __delay_cycles(150000);
 
-  if (received == '\n') { // If new line received it is the end of the mssg
-    rxBuffer[rxIndex] = 0;
-    rxIndex = 0; // reset buffer for next mssg
+    } else if (currentMode == 'B') {
+      P1OUT ^= LED1;
+      // P1OUT &= ~LED1;
+      __delay_cycles(100000);
 
-    int idx = rxBuffer[0] - '0'; // converts first character into integer
-
-    if (idx >= 0 && idx < 10) {
-      uartSendChar(refArray[idx]);
-      uartSendChar('\n');
+    } else if (currentMode == 'C') {
+      P1OUT ^= LED1;
+      // P1OUT &= ~LED1;
+      __delay_cycles(50000);
     } else {
-      uartSendString("ERR\n");
-    }
-  } else {
-    if (rxIndex < 4) {
-      rxBuffer[rxIndex++] = received;
+      P1OUT &= ~LED1;
+      // P1OUT &= ~LED2;
     }
   }
+}
+
+#pragma vector = USCIAB0RX_VECTOR
+__interrupt void USCI0RX_ISR(void) {
+  rxData = UCA0RXBUF;
+
+  if (rxData == 'A' | rxData == 'B' | rxData == 'C' | rxData == 'D') {
+    currentMode = rxData;
+  } else {
+    currentMode = 0;
+  }
+  __bic_SR_register_on_exit(LPM0_bits); // Wake up MCU
 }
