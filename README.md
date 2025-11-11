@@ -1,4 +1,4 @@
-# UART Examples — MSP430 ↔ PC
+# UART Examples — MSP430 ↔ Python
 
 This repository contains simple UART examples that demonstrate two-way serial communication between a PC (Python) and an MSP430 microcontroller. The examples show how to:
 
