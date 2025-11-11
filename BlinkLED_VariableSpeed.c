@@ -73,3 +73,4 @@ __interrupt void USCI0RX_ISR(void) {
   }
   __bic_SR_register_on_exit(LPM0_bits); // Wake up MCU
 }
+
