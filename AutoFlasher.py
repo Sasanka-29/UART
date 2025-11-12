@@ -7,7 +7,7 @@ MSP_TOOL = r"C:\ti\MSPFlasher_1.3.20\MSP430Flasher.exe"
 
 
 def flash_msp430():
-    print("\n🚀 Flashing MSP430...")
+    print("\n Flashing MSP430...")
 
     cmd = [MSP_TOOL,"-w", HEX_FILE, "-v", "-g", "-z", "[VCC]", "-i", PORT]
 
