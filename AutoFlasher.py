@@ -1,7 +1,6 @@
 import subprocess
 import sys
 
-# ---------- CONFIG ----------
 HEX_FILE = r"C:\ti\MSPFlasher_1.3.20\BlinkRedLED_MSP-EXP430G2ET.hex"
 PORT = "COM24"
 MSP_TOOL = r"C:\ti\MSPFlasher_1.3.20\MSP430Flasher.exe"
