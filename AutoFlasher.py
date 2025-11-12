@@ -54,20 +54,21 @@ while True:
 
     idx = input("\nEnter index (0-9) to request or x to exit: ")
 
-    if idx.lower() == 'x':
-        break
+    if idx.lower() != 'x':
+        if idx.isdigit() and (0 <= int(idx) <= 9):  #Prevent non-integer inputs and then converts string to int
+            received = request_char(idx)  #Calls request_char function to send an index to MSP and get a reply
+            expected = ref_list[int(idx)]  #looks up the expected value in ref_list
 
-    if not idx.isdigit() or not (0 <= int(idx) <= 9):  #Prevent non-integer inputs and then converts string to int
+            print("MSP430 replied :", received)
+            print("Expected       :", expected)
+
+            if received == expected:
+                print("Match!\n")
+            else:
+                print("Mismatch\n")
+            continue
+
         print("Invalid input, enter 0-9")
-        continue
 
-    received = request_char(idx)  #Calls request_char function to send an index to MSP and get a reply
-    expected = ref_list[int(idx)]  #looks up the expected value in ref_list
-
-    print("MSP430 replied :", received)
-    print("Expected       :", expected)
-
-    if received == expected:
-        print("Match!\n")
-    else:
-        print("Mismatch\n")
+    break
+ser.close()
