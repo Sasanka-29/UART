@@ -2,13 +2,16 @@ import subprocess
 import sys
 import serial
 import time
+from pathlib import Path
 
 ref_list = ['A', 'F', 'K', '3', 'Z', 'Q', 'L', '9', 'M', '2']
 
 ser = serial.Serial('COM28', 9600)
 time.sleep(2)
 
-HEX_FILE = r"C:\Users\sasan\workspace_ccstheia\Sending_RandomValue_UART\Debug\Sending_RandomValue_UART.hex"
+hex_path_input = input("\nEnter path to .hex file: ").strip('"')
+
+HEX_FILE = Path(hex_path_input)
 PORT = "COM24"
 MSP_TOOL = r"C:\ti\MSPFlasher_1.3.20\MSP430Flasher.exe"
 
@@ -51,6 +54,7 @@ while True:
         sys.exit("Exiting")
     else:
         print("Invalid option")
+        break
 
     idx = input("\nEnter index (0-9) to request or x to exit: ")
 
